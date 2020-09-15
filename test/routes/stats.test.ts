@@ -71,8 +71,8 @@ describe("Legacy routes", () => {
       const st = await getStats();
       expect(st[st.length - 1].PlayersOnline).toEqual("30");
       expect(st[st.length - 1].ServersOnline).toEqual("1");
-      expect(st[st.length - 2].PlayersOnline).toEqual("3");
-      expect(st[st.length - 2].ServersOnline).toEqual("1");
+      expect(st[st.length - 2].PlayersOnline).toEqual("2");
+      expect(st[st.length - 2].ServersOnline).toEqual("2");
     }
 
     LegacyController.statsUpdateRate = 0;
@@ -88,8 +88,8 @@ describe("Legacy routes", () => {
     expect(st[st.length - 1].ServersOnline).toEqual("1");
     expect(st[st.length - 2].PlayersOnline).toEqual("30");
     expect(st[st.length - 2].ServersOnline).toEqual("1");
-    expect(st[st.length - 3].PlayersOnline).toEqual("3");
-    expect(st[st.length - 3].ServersOnline).toEqual("1");
+    expect(st[st.length - 3].PlayersOnline).toEqual("2");
+    expect(st[st.length - 3].ServersOnline).toEqual("2");
 
     LegacyController.statsUpdateRate = defaultStatsUpdateRate;
   });

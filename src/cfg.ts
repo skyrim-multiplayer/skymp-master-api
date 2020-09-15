@@ -7,6 +7,7 @@ export interface Config {
   EMAIL_USER: string;
   EMAIL_PASS: string;
   STATS_CSV_PATH: string;
+  IS_GITHUB_ACTION?: string;
 }
 
 const getConfig = (): Config => {

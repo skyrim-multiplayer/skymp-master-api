@@ -79,7 +79,10 @@ export class TestUtilsProvider {
     fs.writeFileSync(TestUtilsProvider.statsCsvPath, prefix);
     const connection = await createConnection({
       type: "postgres",
-      url: config.DB_URL + "_test",
+      url:
+        config.IS_GITHUB_ACTION === "true"
+          ? config.DB_URL
+          : config.DB_URL + "_test",
       logging: false,
       synchronize: true,
       entities: entities,
