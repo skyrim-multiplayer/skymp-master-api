@@ -30,7 +30,7 @@ jobs:
           file-name: "cfg"
           PORT: 3000
           JWT_SECRET: "your-secret-whatever?"
-          DB_URL: "postgres://postgres:@localhost:5432/test"
+          DB_URL: "postgres://postgres:postgres@localhost:5432/test"
       - run: npm install
       - run: npm run lint
       - run: mv cfg src/config.json && npm run test
