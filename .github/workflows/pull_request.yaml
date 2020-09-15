@@ -7,6 +7,9 @@ jobs:
       DNOHUB_USERNAME: ${{ secrets.DNOHUB_USERNAME }}
       DNOHUB_PASSWORD: ${{ secrets.DNOHUB_PASSWORD }}
       MASTER_URL: ${{ secrets.MASTER_URL }}
+      INPUT_POSTGRESQL_DB: "test"
+      INPUT_POSTGRESQL_USER: "test"
+      INPUT_POSTGRESQL_PASSWORD: "password"
     steps:
       - uses: harmon758/postgresql-action@v1
         with:
@@ -22,7 +25,7 @@ jobs:
           file-name: "cfg"
           PORT: 3000
           JWT_SECRET: "your-secret-whatever?"
-          DB_URL: "postgres://test:password@localhost/test"
+          DB_URL: "postgres://test:password@localhost:5432/test"
       - run: npm install
       - run: npm run lint
       - run: mv cfg src/config.json && npm run test
