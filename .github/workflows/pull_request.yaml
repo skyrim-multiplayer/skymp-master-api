@@ -7,9 +7,9 @@ jobs:
       DNOHUB_USERNAME: ${{ secrets.DNOHUB_USERNAME }}
       DNOHUB_PASSWORD: ${{ secrets.DNOHUB_PASSWORD }}
       MASTER_URL: ${{ secrets.MASTER_URL }}
-      INPUT_POSTGRESQL_DB: "test"
-      INPUT_POSTGRESQL_USER: "test"
-      INPUT_POSTGRESQL_PASSWORD: "password"
+      INPUT_POSTGRESQL_DB: "postgres"
+      INPUT_POSTGRESQL_USER: "postgres"
+      INPUT_POSTGRESQL_PASSWORD: "test"
     steps:
       - uses: harmon758/postgresql-action@v1
         with:
