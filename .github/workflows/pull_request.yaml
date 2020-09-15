@@ -19,7 +19,7 @@ jobs:
       - uses: schdck/create-env-json@v1
         id: create-env
         with:
-          file-name: "cfg"
+          file-name: "config.json"
           PORT: 3000
           JWT_SECRET: "your-secret-whatever?"
           DB_URL: "postgres://test:password@localhost/test"
