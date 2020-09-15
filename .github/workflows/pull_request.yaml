@@ -7,7 +7,6 @@ jobs:
       DNOHUB_USERNAME: ${{ secrets.DNOHUB_USERNAME }}
       DNOHUB_PASSWORD: ${{ secrets.DNOHUB_PASSWORD }}
       MASTER_URL: ${{ secrets.MASTER_URL }}
-      POSTGRES_PASSWORD: postgres
     services:
       db:
         image: postgres:11
@@ -17,6 +16,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 15
+        env:
+          POSTGRES_PASSWORD: postgres
     steps:
       - uses: harmon758/postgresql-action@v1
         with:
