@@ -19,10 +19,10 @@ jobs:
       - uses: schdck/create-env-json@v1
         id: create-env
         with:
-          file-name: "config.json"
+          file-name: "cfg"
           PORT: 3000
           JWT_SECRET: "your-secret-whatever?"
           DB_URL: "postgres://test:password@localhost/test"
       - run: npm install
       - run: npm run lint
-      - run: npm run test
+      - run: mv cfg src/config.json && npm run test
