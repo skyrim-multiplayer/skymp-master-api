@@ -1,0 +1,28 @@
+on:
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DNOHUB_USERNAME: ${{ secrets.DNOHUB_USERNAME }}
+      DNOHUB_PASSWORD: ${{ secrets.DNOHUB_PASSWORD }}
+      MASTER_URL: ${{ secrets.MASTER_URL }}
+    steps:
+      - uses: harmon758/postgresql-action@v1
+        with:
+          postgresql version: "11"
+      - uses: actions/checkout@v2
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - uses: schdck/create-env-json@v1
+        id: create-env
+        with:
+          file-name: "cfg"
+          PORT: 3000
+          JWT_SECRET: "your-secret-whatever?"
+          DB_URL: "postgres://test:password@localhost/test"
+      - run: npm install
+      - run: npm run lint
+      - run: npm run test
