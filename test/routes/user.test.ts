@@ -198,7 +198,6 @@ describe("User system", () => {
     await expect(loginAsTestUser(user, "lolkek")).rejects.toThrow();
 
     const res = await api.post(`/users/${user.id}/reset-password`, {
-      password: "jejeje",
       email: "lelele@test.be"
     });
 

@@ -150,6 +150,7 @@ export class UserController {
     if (!Number.isInteger(id)) id = -1;
 
     const newPassword = ctx.request.body.newPassword || generatePassword(16);
+    const passwordGenerated = !ctx.request.body.newPassword;
 
     const password = await hashString(
       "" + ctx.request.body.password,
@@ -161,11 +162,13 @@ export class UserController {
     );
     const userRepository = UserController.getRepository(ctx);
     const updateResult = await userRepository.update(
-      {
-        id,
-        password,
-        hasVerifiedEmail: true
-      },
+      passwordGenerated
+        ? { id, hasVerifiedEmail: true }
+        : {
+            id,
+            password,
+            hasVerifiedEmail: true
+          },
       {
         password: newPasswordHashed
       }
@@ -176,7 +179,7 @@ export class UserController {
       if (user) {
         await sendResetPassword(ctx.request.body.email, user.name, newPassword);
         ctx.body = {
-          passwordGenerated: !ctx.request.body.newPassword
+          passwordGenerated
         };
       } else ctx.throw(418);
     } else {
