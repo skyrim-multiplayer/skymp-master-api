@@ -90,8 +90,25 @@ export const sendSignupResetPin = async (
       to: email
     },
     locals: {
-      username: username,
-      code: code
+      username,
+      code
+    }
+  });
+};
+
+export const sendResetPassword = async (
+  email: string,
+  username: string,
+  newPassword: string
+): Promise<void> => {
+  await emailObject.send({
+    template: "reset-password",
+    message: {
+      to: email
+    },
+    locals: {
+      username,
+      newPassword
     }
   });
 };

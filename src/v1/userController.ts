@@ -1,3 +1,4 @@
+import * as crypto from "crypto";
 import { Context } from "koa";
 import * as Router from "koa-router";
 import { getManager, Repository } from "typeorm";
@@ -5,7 +6,11 @@ import { validate, ValidationError } from "class-validator";
 
 import { hashString } from "../utils/hashString";
 import { User, VERIFICATION_EXPIRES } from "../models/user";
-import { sendSignupSuccess, sendSignupResetPin } from "../emails";
+import {
+  sendSignupSuccess,
+  sendSignupResetPin,
+  sendResetPassword
+} from "../emails";
 import { randomString } from "../utils/random-string";
 
 import * as Passport from "koa-passport";
@@ -14,12 +19,21 @@ import * as jwt from "jsonwebtoken";
 
 import { config } from "../cfg";
 
+const generatePassword = (
+  length = 20,
+  wishlist = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~!@-#$"
+) =>
+  Array.from(crypto.randomFillSync(new Uint32Array(length)))
+    .map((x) => wishlist[x % wishlist.length])
+    .join("");
+
 export class UserController {
   static getRouter(): Router {
     return new Router()
       .post("/users", UserController.createUser)
       .post("/users/:id/verify", UserController.verify)
       .post("/users/:id/reset-pin", UserController.resetPin)
+      .post("/users/:id/reset-password", UserController.resetPassword)
       .post("/users/login", UserController.login);
   }
 
@@ -127,6 +141,47 @@ export class UserController {
       const token = `JWT ${jwt.sign(payload, config.JWT_SECRET)}`;
       ctx.body = { token, id, name: user.name };
     })(ctx, next);
+  }
+
+  static async resetPassword(
+    ctx: Context | Router.RouterContext
+  ): Promise<void> {
+    let id = +ctx.params.id;
+    if (!Number.isInteger(id)) id = -1;
+
+    const newPassword = ctx.request.body.newPassword || generatePassword(16);
+
+    const password = await hashString(
+      "" + ctx.request.body.password,
+      "" + ctx.request.body.email
+    );
+    const newPasswordHashed = await hashString(
+      newPassword,
+      "" + ctx.request.body.email
+    );
+    const userRepository = UserController.getRepository(ctx);
+    const updateResult = await userRepository.update(
+      {
+        id,
+        password,
+        hasVerifiedEmail: true
+      },
+      {
+        password: newPasswordHashed
+      }
+    );
+
+    if (updateResult.affected) {
+      const user = await userRepository.findOne({ id });
+      if (user) {
+        await sendResetPassword(ctx.request.body.email, user.name, newPassword);
+        ctx.body = {
+          passwordGenerated: !ctx.request.body.newPassword
+        };
+      } else ctx.throw(418);
+    } else {
+      ctx.throw(404);
+    }
   }
 
   static async resetPin(ctx: Context | Router.RouterContext): Promise<void> {

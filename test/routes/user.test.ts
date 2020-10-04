@@ -4,11 +4,14 @@ import { User, Roles, VERIFICATION_EXPIRES } from "../../src/models/user";
 beforeEach(TestUtilsProvider.beforeEach);
 afterEach(TestUtilsProvider.afterEach);
 
-const loginAsTestUser = async (user: User): Promise<string> => {
+const loginAsTestUser = async (
+  user: User,
+  password = "jejeje"
+): Promise<string> => {
   const { api } = TestUtilsProvider;
   const res = await api.post("/users/login", {
     email: user.email,
-    password: "jejeje"
+    password
   });
   return res.data.token as string;
 };
@@ -167,6 +170,40 @@ describe("User system", () => {
     expect(res.status).toEqual(200);
     expect(`${res.data.token}`).toMatch(/JWT\s.*/);
     expect(await users.count({ hasVerifiedEmail: true })).toEqual(1);
+  });
+
+  it("should be able to change user's password", async () => {
+    const { api, createTestUser } = TestUtilsProvider;
+    const { user } = await createTestUser({ hasVerifiedEmail: true });
+
+    await loginAsTestUser(user, "jejeje");
+    await expect(loginAsTestUser(user, "lolkek")).rejects.toThrow();
+
+    const res = await api.post(`/users/${user.id}/reset-password`, {
+      password: "jejeje",
+      email: "lelele@test.be",
+      newPassword: "lolkek"
+    });
+
+    expect(res.data["passwordGenerated"]).toEqual(false);
+    await expect(loginAsTestUser(user, "jejeje")).rejects.toThrow();
+    await loginAsTestUser(user, "lolkek");
+  });
+
+  it("should be able to reset user's password", async () => {
+    const { api, createTestUser } = TestUtilsProvider;
+    const { user } = await createTestUser({ hasVerifiedEmail: true });
+
+    await loginAsTestUser(user, "jejeje");
+    await expect(loginAsTestUser(user, "lolkek")).rejects.toThrow();
+
+    const res = await api.post(`/users/${user.id}/reset-password`, {
+      password: "jejeje",
+      email: "lelele@test.be"
+    });
+
+    expect(res.data["passwordGenerated"]).toEqual(true);
+    await expect(loginAsTestUser(user, "jejeje")).rejects.toThrow();
   });
 
   it("should fail to create accounts with same emails", async () => {
