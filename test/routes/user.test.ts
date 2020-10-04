@@ -179,7 +179,7 @@ describe("User system", () => {
     await loginAsTestUser(user, "jejeje");
     await expect(loginAsTestUser(user, "lolkek")).rejects.toThrow();
 
-    const res = await api.post(`/users/${user.id}/reset-password`, {
+    const res = await api.post(`/users/reset-password`, {
       password: "jejeje",
       email: "lelele@test.be",
       newPassword: "lolkek"
@@ -197,7 +197,7 @@ describe("User system", () => {
     await loginAsTestUser(user, "jejeje");
     await expect(loginAsTestUser(user, "lolkek")).rejects.toThrow();
 
-    const res = await api.post(`/users/${user.id}/reset-password`, {
+    const res = await api.post(`/users/reset-password`, {
       email: "lelele@test.be"
     });
 

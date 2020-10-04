@@ -33,7 +33,7 @@ export class UserController {
       .post("/users", UserController.createUser)
       .post("/users/:id/verify", UserController.verify)
       .post("/users/:id/reset-pin", UserController.resetPin)
-      .post("/users/:id/reset-password", UserController.resetPassword)
+      .post("/users/reset-password", UserController.resetPassword)
       .post("/users/login", UserController.login);
   }
 
@@ -146,9 +146,6 @@ export class UserController {
   static async resetPassword(
     ctx: Context | Router.RouterContext
   ): Promise<void> {
-    let id = +ctx.params.id;
-    if (!Number.isInteger(id)) id = -1;
-
     const newPassword = ctx.request.body.newPassword || generatePassword(16);
     const passwordGenerated = !ctx.request.body.newPassword;
 
@@ -163,9 +160,9 @@ export class UserController {
     const userRepository = UserController.getRepository(ctx);
     const updateResult = await userRepository.update(
       passwordGenerated
-        ? { id, hasVerifiedEmail: true }
+        ? { email: ctx.request.body.email, hasVerifiedEmail: true }
         : {
-            id,
+            email: ctx.request.body.email,
             password,
             hasVerifiedEmail: true
           },
@@ -175,7 +172,9 @@ export class UserController {
     );
 
     if (updateResult.affected) {
-      const user = await userRepository.findOne({ id });
+      const user = await userRepository.findOne({
+        email: ctx.request.body.email
+      });
       if (user) {
         await sendResetPassword(ctx.request.body.email, user.name, newPassword);
         ctx.body = {
