@@ -305,4 +305,43 @@ describe("User system", () => {
       })
     ).rejects.toThrow();
   });
+
+  it("should be able to get user's info", async () => {
+    const { api, createTestUser } = TestUtilsProvider;
+    const { user } = await createTestUser({ hasVerifiedEmail: true });
+
+    const token = await loginAsTestUser(user, "jejeje");
+    const res = await api.get(`/users/${user.id}`, {
+      headers: { Authorization: token }
+    });
+    expect(res.data).toEqual({
+      name: "igor"
+    });
+  });
+
+  it("should be fail to get user's info with token from other user", async () => {
+    const { api, createTestUser } = TestUtilsProvider;
+    await createTestUser({
+      hasVerifiedEmail: true,
+      name: "ulfric",
+      email: "investigate@new.ps"
+    });
+
+    const { user } = await createTestUser({ hasVerifiedEmail: true });
+    const token = await loginAsTestUser(user, "jejeje");
+    await expect(
+      api.get(`/users/${user.id - 1}`, {
+        headers: { Authorization: token }
+      })
+    ).rejects.toThrowError("Request failed with status code 403");
+  });
+
+  it("should be fail to get user's info without token", async () => {
+    const { api, createTestUser } = TestUtilsProvider;
+
+    const { user } = await createTestUser({ hasVerifiedEmail: true });
+    await expect(api.get(`/users/${user.id}`)).rejects.toThrowError(
+      "Request failed with status code 401"
+    );
+  });
 });

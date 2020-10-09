@@ -20,6 +20,7 @@ export const withAuth = (
       return ctx.throw(403, "Your email not verified");
     if (roles.length && !R.intersection(user.roles, roles).length)
       return ctx.throw(403, "You don't have permission to access");
+    (ctx as Record<string, unknown>).user = user;
     next();
   })(ctx, next);
 };

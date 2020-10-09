@@ -8,7 +8,6 @@ import { entities } from "../models";
 import { App } from "../app";
 import { User } from "../models/user";
 import { config } from "../cfg";
-import { hashString } from "./hashString";
 
 export interface TestUserInfo {
   user: User;
@@ -56,7 +55,7 @@ export class TestUtilsProvider {
     await TestUtilsProvider.users.save(usr);
 
     const user = await TestUtilsProvider.users.findOne({
-      verificationPin: await hashString("qwerty", "lelele@test.be")
+      name: usr.name
     });
     expect(user).not.toBeFalsy();
     if (!user) return { user: usr };

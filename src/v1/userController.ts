@@ -3,6 +3,8 @@ import { Context } from "koa";
 import * as Router from "koa-router";
 import { getManager, Repository } from "typeorm";
 import { validate, ValidationError } from "class-validator";
+import * as Passport from "koa-passport";
+import * as jwt from "jsonwebtoken";
 
 import { hashString } from "../utils/hashString";
 import { User, VERIFICATION_EXPIRES } from "../models/user";
@@ -12,12 +14,8 @@ import {
   sendResetPassword
 } from "../emails";
 import { randomString } from "../utils/random-string";
-
-import * as Passport from "koa-passport";
-
-import * as jwt from "jsonwebtoken";
-
 import { config } from "../cfg";
+import { withAuth } from "../middlewares/auth";
 
 const generatePassword = (
   length = 20,
@@ -34,7 +32,8 @@ export class UserController {
       .post("/users/:id/verify", UserController.verify)
       .post("/users/:id/reset-pin", UserController.resetPin)
       .post("/users/reset-password", UserController.resetPassword)
-      .post("/users/login", UserController.login);
+      .post("/users/login", UserController.login)
+      .get("/users/:id", withAuth(), UserController.getUserInfo);
   }
 
   static getRepository(ctx: Context | Router.RouterContext): Repository<User> {
@@ -143,6 +142,15 @@ export class UserController {
       const token = `JWT ${jwt.sign(payload, config.JWT_SECRET)}`;
       ctx.body = { token, id, name: user.name };
     })(ctx, next);
+  }
+
+  static async getUserInfo(ctx: Context | Router.RouterContext): Promise<void> {
+    const user = (ctx as Record<string, User>).user;
+    const id = +ctx.params.id;
+    if (id !== user.id) {
+      ctx.status = 403;
+      ctx.body = "Token doesn't match id";
+    } else ctx.body = { name: user.name };
   }
 
   static async resetPassword(
