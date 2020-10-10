@@ -96,6 +96,7 @@ export class User {
     this.verificationPin = await hashString(pin, this.email);
     this.verificationPinSentAt = new Date();
 
-    await sendSignupVerifyPin(this.email, this.name, pin);
+    const url = `https://skymp.io/api/enduser-verify/${this.email}/${pin}`;
+    await sendSignupVerifyPin(this.email, this.name, url);
   }
 }

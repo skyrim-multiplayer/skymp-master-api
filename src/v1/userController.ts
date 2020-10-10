@@ -33,7 +33,8 @@ export class UserController {
       .post("/users/:id/reset-pin", UserController.resetPin)
       .post("/users/reset-password", UserController.resetPassword)
       .post("/users/login", UserController.login)
-      .get("/users/:id", withAuth(), UserController.getUserInfo);
+      .get("/users/:id", withAuth(), UserController.getUserInfo)
+      .get("/enduser-verify/:email/:pin", UserController.verifyEnduser);
   }
 
   static getRepository(ctx: Context | Router.RouterContext): Repository<User> {
@@ -51,7 +52,7 @@ export class UserController {
     user.name = name;
     user.email = email;
     user.password = password;
-    user.verificationPin = randomString(6);
+    user.verificationPin = randomString(32);
 
     const errors: ValidationError[] = await validate(user, {
       skipMissingProperties: true
@@ -79,35 +80,52 @@ export class UserController {
     }
   }
 
-  static async verify(ctx: Context | Router.RouterContext): Promise<void> {
+  private static async verifyImpl(
+    ctx: Context | Router.RouterContext,
+    id: number,
+    email: string,
+    verificationPin: string,
+    password?: string
+  ): Promise<boolean> {
+    const passwordHash = await hashString("" + password, "" + email);
+    const verificationPinHash = await hashString(
+      "" + verificationPin,
+      "" + email
+    );
     const userRepository = UserController.getRepository(ctx);
-
-    let id = +ctx.params.id;
-    if (!Number.isInteger(id)) id = -1;
-
-    const password = await hashString(
-      "" + ctx.request.body.password,
-      "" + ctx.request.body.email
-    );
-
-    const verificationPin = await hashString(
-      "" + ctx.request.body.pin,
-      "" + ctx.request.body.email
-    );
-
     const updateResult = await userRepository.update(
-      {
-        id,
-        verificationPin,
-        password,
-        hasVerifiedEmail: false
-      },
+      password
+        ? {
+            id,
+            verificationPin: verificationPinHash,
+            password: passwordHash,
+            hasVerifiedEmail: false
+          }
+        : {
+            id,
+            verificationPin: verificationPinHash,
+            hasVerifiedEmail: false
+          },
       {
         hasVerifiedEmail: true
       }
     );
+    return !!updateResult.affected;
+  }
 
-    if (updateResult.affected) {
+  static async verify(ctx: Context | Router.RouterContext): Promise<void> {
+    let id = +ctx.params.id;
+    if (!Number.isInteger(id)) id = -1;
+
+    if (
+      await UserController.verifyImpl(
+        ctx,
+        id,
+        ctx.request.body.email,
+        ctx.request.body.pin,
+        ctx.request.body.password
+      )
+    ) {
       await sendSignupSuccess(ctx.request.body.email);
       ctx.status = 200;
       const token = jwt.sign(
@@ -122,6 +140,43 @@ export class UserController {
     } else {
       ctx.throw(404);
     }
+  }
+
+  static async verifyEnduser(
+    ctx: Context | Router.RouterContext
+  ): Promise<void> {
+    const accountVerifiedMessage =
+      "Адрес электронной почты подтверждён успешно";
+    const accountNotVerifiedMessage =
+      "Ошибка при подтверждении адреса электронной почты";
+
+    const user = await UserController.getRepository(ctx).findOne({
+      email: ctx.params.email
+    });
+    const id = user ? user.id : -1;
+    const verified = await UserController.verifyImpl(
+      ctx,
+      id,
+      ctx.params.email,
+      ctx.params.pin
+    );
+    ctx.type = "html";
+    ctx.body = `<html lang="en-us"><head>
+    <meta charset="UTF-8">
+    <title>Skyrim Multiplayer by skyrim-multiplayer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+
+<center><h1>${
+      verified ? accountVerifiedMessage : accountNotVerifiedMessage
+    }</h1></center>
+
+</body></html>`;
   }
 
   static async login(
@@ -221,7 +276,7 @@ export class UserController {
     ) {
       ctx.throw(400, "Code is expired");
     } else {
-      const newPin = randomString(6);
+      const newPin = randomString(32);
 
       // Maybe override EntityRepository method save ???
       user.verificationPin = await hashString(newPin, user.email);

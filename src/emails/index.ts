@@ -56,7 +56,7 @@ const emailObject =
 export const sendSignupVerifyPin = async (
   email: string,
   username: string,
-  code: string
+  url: string
 ): Promise<void> => {
   await emailObject.send({
     template: "signup",
@@ -65,7 +65,7 @@ export const sendSignupVerifyPin = async (
     },
     locals: {
       username: username,
-      code: code
+      url: url
     }
   });
 };
