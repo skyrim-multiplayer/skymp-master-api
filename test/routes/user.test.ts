@@ -1,5 +1,6 @@
 import { TestUtilsProvider } from "../../src/utils/testUtils";
 import { User, Roles, VERIFICATION_EXPIRES } from "../../src/models/user";
+import { getMyPublicIp } from "../../src/utils/publicIp";
 
 beforeEach(TestUtilsProvider.beforeEach);
 afterEach(TestUtilsProvider.afterEach);
@@ -343,5 +344,30 @@ describe("User system", () => {
     await expect(api.get(`/users/${user.id}`)).rejects.toThrowError(
       "Request failed with status code 401"
     );
+  });
+
+  it("should be able to play specific server", async () => {
+    const { api, createTestUser } = TestUtilsProvider;
+    const { user } = await createTestUser({ hasVerifiedEmail: true });
+    const token = await loginAsTestUser(user);
+    const myIp = await getMyPublicIp();
+
+    const serverAddress = `${myIp}:7777`;
+
+    await api.post(`/servers/${serverAddress}`);
+
+    const res = await api.post(
+      `/users/${user.id}/play/${serverAddress}`,
+      {},
+      { headers: { Authorization: token } }
+    );
+    const session = res.data.session as string;
+
+    expect(session.length).toEqual(32);
+
+    const getSessionInfoRes = await api.get(
+      `/servers/${serverAddress}/sessions/${session}`
+    );
+    expect(getSessionInfoRes.data.user.id).toEqual(user.id);
   });
 });

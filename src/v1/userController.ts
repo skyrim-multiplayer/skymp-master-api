@@ -34,7 +34,12 @@ export class UserController {
       .post("/users/reset-password", UserController.resetPassword)
       .post("/users/login", UserController.login)
       .get("/users/:id", withAuth(), UserController.getUserInfo)
-      .get("/enduser-verify/:email/:pin", UserController.verifyEnduser);
+      .get("/enduser-verify/:email/:pin", UserController.verifyEnduser)
+      .post("/users/:id/play/:serverAddress", withAuth(), UserController.play)
+      .get(
+        "/servers/:serverAddress/sessions/:session",
+        UserController.getUserByServerAndSession
+      );
   }
 
   static getRepository(ctx: Context | Router.RouterContext): Repository<User> {
@@ -142,6 +147,35 @@ export class UserController {
     }
   }
 
+  static async play(ctx: Context | Router.RouterContext): Promise<void> {
+    const user = (ctx as Record<string, User>).user;
+    if (!(await UserController.ensureTokenMatchesId(ctx))) return;
+    user.currentServerAddress = ctx.params.serverAddress;
+    user.currentSession = randomString(32);
+    await UserController.getRepository(ctx).save(user);
+    ctx.status = 200;
+    ctx.body = {
+      session: user.currentSession
+    };
+  }
+
+  static async getUserByServerAndSession(
+    ctx: Context | Router.RouterContext
+  ): Promise<void> {
+    const { serverAddress, session } = ctx.params;
+    const user = await UserController.getRepository(ctx).findOne({
+      currentServerAddress: serverAddress,
+      currentSession: session
+    });
+    if (!user) return ctx.throw(404);
+    else
+      ctx.body = {
+        user: {
+          id: user.id
+        }
+      };
+  }
+
   static async verifyEnduser(
     ctx: Context | Router.RouterContext
   ): Promise<void> {
@@ -199,13 +233,23 @@ export class UserController {
     })(ctx, next);
   }
 
-  static async getUserInfo(ctx: Context | Router.RouterContext): Promise<void> {
+  static async ensureTokenMatchesId(
+    ctx: Context | Router.RouterContext
+  ): Promise<boolean> {
     const user = (ctx as Record<string, User>).user;
     const id = +ctx.params.id;
     if (id !== user.id) {
       ctx.status = 403;
       ctx.body = "Token doesn't match id";
-    } else ctx.body = { name: user.name };
+      return false;
+    }
+    return true;
+  }
+
+  static async getUserInfo(ctx: Context | Router.RouterContext): Promise<void> {
+    const user = (ctx as Record<string, User>).user;
+    if (!(await UserController.ensureTokenMatchesId(ctx))) return;
+    ctx.body = { name: user.name };
   }
 
   static async resetPassword(

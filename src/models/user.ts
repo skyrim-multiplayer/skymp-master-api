@@ -85,6 +85,20 @@ export class User {
   })
   updateAt!: Date;
 
+  @Column("varchar", {
+    name: "current_server_address",
+    nullable: true,
+    default: null
+  })
+  currentServerAddress!: string;
+
+  @Column("varchar", {
+    name: "current_session",
+    nullable: true,
+    default: null
+  })
+  currentSession!: string;
+
   @BeforeInsert()
   async hashPassword(): Promise<void> {
     this.password = await hashString(this.password, this.email);
