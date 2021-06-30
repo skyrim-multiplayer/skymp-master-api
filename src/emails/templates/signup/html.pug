@@ -1,3 +1,234 @@
-p А, вот ты где, #{username}, а я тебя повсюду ищу. Тебе просили кое-что передать лично в руки. Так, посмотрим...
-p Перейдите по ссылке, чтобы подтвердить адрес электронной почты:
-a(href=``+url) #{url}
+link(rel="preconnect", href="https://fonts.googleapis.com")
+link(rel="preconnect", href="https://fonts.gstatic.com", crossorigin)
+link(
+  href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap",
+  rel="stylesheet"
+)
+table(
+  style={
+    'background-color': '#ffffff',
+    'border-collapse': 'collapse',
+    'border-spacing': 0,
+    'line-height': 'inherit',
+    'min-width': '320px',
+    'vertical-align': 'top',
+    width: '100%',
+  }
+)
+  tbody(
+    style={
+      'line-height': 'inherit',
+      'vertical-align': 'top',
+    }
+  )
+    tr(
+      style={
+        'border-collapse': 'collapse',
+        'line-height': 'inherit',
+        'vertical-align': 'top',
+      }
+    )
+      td(
+        style={
+          'border-collapse': 'collapse',
+          'line-height': 'inherit',
+          'vertical-align': 'top',
+          'word-break': 'break-word',
+        }
+      )
+        div(style={
+          background: 'transparent',
+        })
+          div(
+            style={
+              'background-color': '#ffffff',
+              'line-height': 'inherit',
+              margin: '0 auto 0 auto',
+              'max-width': '590px',
+              'min-width': '320px',
+              'word-break': 'break-word',
+              'word-wrap': 'break-word',
+              'text-align': 'center',
+            }
+          )
+            img(
+              src="https://raw.githubusercontent.com/vladdenisov/test/main/logo-head.png",
+              style={
+                border: 0,
+                height: 'auto',
+                'line-height': 'inherit',
+                'max-width': '531px',
+                'text-decoration': 'none',
+                width: '100%',
+                align: 'center',
+              }
+            )
+        div(style={
+          background: 'transparent',
+        })
+          div(
+            style={
+              'background-color': '#ffffff',
+              'line-height': 'inherit',
+              margin: '0 auto 0 auto',
+              'max-width': '590px',
+              'min-width': '320px',
+              'word-break': 'break-word',
+              'word-wrap': 'break-word',
+            }
+          )
+            div(
+              style={
+                color: 'black',
+                'font-family': `'Arial Bold','helvetica neue','helvetica', 'PT Sans', sans-serif`,
+                'line-height': 1.5,
+                padding: '5px 30px 5px 30px',
+                'text-align': 'center',
+              }
+            )
+              span(
+                style={
+                  'font-size': '32px',
+                  'font-weight': 700,
+                }
+              ) А, вот ты где, #{ username }!
+        div(
+          style={
+            background: 'transparent',
+            'margin-top': '10px',
+          }
+        )
+          div(
+            style={
+              'background-color': '#ffffff',
+              'line-height': 'inherit',
+              margin: '0 auto 0 auto',
+              'max-width': '590px',
+              'min-width': '320px',
+              'word-break': 'break-word',
+              'word-wrap': 'break-word',
+              'text-align': 'center',
+            }
+          )
+            img(
+              src="https://raw.githubusercontent.com/Pospelove/test/main/signup-confirm.png",
+              style={
+                border: 0,
+                height: 'auto',
+                'line-height': 'inherit',
+                'max-width': '531px',
+                'text-decoration': 'none',
+                width: '100%',
+                align: 'center',
+              }
+            )
+        div(
+          style={
+            background: 'transparent',
+            'margin-top': '20px',
+          }
+        )
+          div(
+            style={
+              'background-color': '#ffffff',
+              'line-height': 'inherit',
+              margin: '0 auto 0 auto',
+              'max-width': '590px',
+              'min-width': '320px',
+              'word-break': 'break-word',
+              'word-wrap': 'break-word',
+            }
+          )
+            div(
+              style={
+                color: 'black',
+                'font-family': `'Arial Bold','helvetica neue','helvetica', 'PT Sans', sans-serif`,
+                'line-height': 1.5,
+                color: '#333333',
+                padding: '5px 30px 5px 30px',
+                'text-align': 'center',
+              }
+            )
+              span(
+                style={
+                  'font-size': '28px',
+                  'font-weight': 700,
+                }
+              ) Так, посмотрим... Кажется, вам нужно подтвердить регистрацию.
+              br
+              span(
+                style={
+                  'font-size': '28px',
+                  'font-weight': 700,
+                }
+              ) Нажмите вот тут, внизу.
+        div(
+          style={
+            background: 'transparent',
+            'margin-top': '50px',
+          }
+        )
+          div(
+            style={
+              'background-color': '#ffffff',
+              'line-height': 'inherit',
+              margin: '0 auto 0 auto',
+              'max-width': '590px',
+              'min-width': '320px',
+              'word-break': 'break-word',
+              'word-wrap': 'break-word',
+            }
+          )
+            div(
+              style={
+                color: 'black',
+                'font-family': `'Arial Bold','helvetica neue','helvetica', 'PT Sans', sans-serif`,
+                'line-height': 1.5,
+                padding: '5px 30px 5px 30px',
+                'text-align': 'center',
+              }
+            )
+              a(href='' + url, target="__blank")
+                button(
+                  style={
+                    width: '155px',
+                    height: '42px',
+                    background: '#771007',
+                    color: 'white',
+                    border: 'none',
+                    cursor: 'pointer',
+                    'font-size': '20px',
+                    'font-weight': 500,
+                    'border-radius': '5px',
+                  }
+                ) Подтвердить
+        div(
+          style={
+            background: 'transparent',
+            'margin-top': '50px',
+          }
+        )
+          div(
+            style={
+              'background-color': '#ffffff',
+              'line-height': 'inherit',
+              margin: '0 auto 20px auto',
+              'max-width': '590px',
+              'min-width': '320px',
+              'word-break': 'break-word',
+              'word-wrap': 'break-word',
+              'text-align': 'center',
+            }
+          )
+            img(
+              src="https://raw.githubusercontent.com/vladdenisov/test/main/footer.png",
+              style={
+                border: 0,
+                height: 'auto',
+                'line-height': 'inherit',
+                'max-width': '530px',
+                'text-decoration': 'none',
+                width: '100%',
+                align: 'center',
+              }
+            )

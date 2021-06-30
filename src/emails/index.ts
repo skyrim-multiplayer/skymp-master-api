@@ -107,6 +107,7 @@ export const sendResetPassword = async (
       to: email
     },
     locals: {
+      picture_id: (Math.random() <= 0.5) ? 1 : 2,
       username,
       newPassword
     }
