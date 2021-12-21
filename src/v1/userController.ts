@@ -101,16 +101,16 @@ export class UserController {
     const updateResult = await userRepository.update(
       password
         ? {
-            id,
-            verificationPin: verificationPinHash,
-            password: passwordHash,
-            hasVerifiedEmail: false
-          }
+          id,
+          verificationPin: verificationPinHash,
+          password: passwordHash,
+          hasVerifiedEmail: false
+        }
         : {
-            id,
-            verificationPin: verificationPinHash,
-            hasVerifiedEmail: false
-          },
+          id,
+          verificationPin: verificationPinHash,
+          hasVerifiedEmail: false
+        },
       {
         hasVerifiedEmail: true
       }
@@ -206,9 +206,8 @@ export class UserController {
   </head>
   <body>
 
-<center><h1>${
-      verified ? accountVerifiedMessage : accountNotVerifiedMessage
-    }</h1></center>
+<center><h1>${verified ? accountVerifiedMessage : accountNotVerifiedMessage
+      }</h1></center>
 
 </body></html>`;
   }
@@ -271,10 +270,10 @@ export class UserController {
       passwordGenerated
         ? { email: ctx.request.body.email, hasVerifiedEmail: true }
         : {
-            email: ctx.request.body.email,
-            password,
-            hasVerifiedEmail: true
-          },
+          email: ctx.request.body.email,
+          password,
+          hasVerifiedEmail: true
+        },
       {
         password: newPasswordHashed
       }

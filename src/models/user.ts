@@ -40,7 +40,7 @@ export class User {
 
   @Column("boolean", {
     name: "has_verified_email",
-    default: false,
+    default: true,
     nullable: false
   })
   hasVerifiedEmail!: boolean;
