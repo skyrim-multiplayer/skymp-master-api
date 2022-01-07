@@ -9,8 +9,6 @@ import {
 } from "typeorm";
 import { Length, IsEmail } from "class-validator";
 
-import { sendSignupVerifyPin } from "../emails";
-
 import { hashString } from "../utils/hashString";
 
 export const VERIFICATION_EXPIRES = 2 * 60 * 1000;
@@ -18,6 +16,10 @@ export const VERIFICATION_EXPIRES = 2 * 60 * 1000;
 export enum Roles {
   user = "user",
   admin = "admin"
+}
+
+export function makeFakeDiscordEmail(discordId: string) {
+  return discordId + '@fake-discord-email.skymp.io';
 }
 
 @Entity("users")
@@ -33,6 +35,8 @@ export class User {
   @Length(5, 100)
   @IsEmail()
   email!: string;
+  // Fake emails built from Discord ids:
+  // 321635713512357216132@fake-discord-email.skymp.io
 
   @Column("varchar", { name: "password", nullable: false, length: 100 })
   @Length(6)
@@ -102,15 +106,5 @@ export class User {
   @BeforeInsert()
   async hashPassword(): Promise<void> {
     this.password = await hashString(this.password, this.email);
-  }
-
-  @BeforeInsert()
-  async sendVerifyPin(): Promise<void> {
-    const pin = this.verificationPin;
-    this.verificationPin = await hashString(pin, this.email);
-    this.verificationPinSentAt = new Date();
-
-    const url = `https://skymp.io/api/enduser-verify/${this.email}/${pin}`;
-    await sendSignupVerifyPin(this.email, this.name, url);
   }
 }
