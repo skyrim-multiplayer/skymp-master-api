@@ -5,6 +5,7 @@ import { getManager, Repository } from "typeorm";
 import { validate, ValidationError } from "class-validator";
 import * as Passport from "koa-passport";
 import * as jwt from "jsonwebtoken";
+import { URLSearchParams } from "url";
 
 import { hashString } from "../utils/hashString";
 import { User, VERIFICATION_EXPIRES } from "../models/user";
@@ -26,6 +27,8 @@ const generatePassword = (
     .join("");
 
 export class UserController {
+  static tokenStorage = new Map<string, string>();
+
   static getRouter(): Router {
     return new Router()
       .post("/users", UserController.createUser)
@@ -33,9 +36,13 @@ export class UserController {
       .post("/users/:id/reset-pin", UserController.resetPin)
       .post("/users/reset-password", UserController.resetPassword)
       .post("/users/login", UserController.login)
+      .get("/users/login-discord", UserController.loginDiscord)
+      .get("/users/login-discord/callback", UserController.loginDiscordCallback)
+      .get("/users/login-discord/status", UserController.loginDiscordStatus)
+      .get("/users/me", withAuth(), UserController.getMyUserInfo)
       .get("/users/:id", withAuth(), UserController.getUserInfo)
       .get("/enduser-verify/:email/:pin", UserController.verifyEnduser)
-      .post("/users/:id/play/:serverAddress", withAuth(), UserController.play)
+      .post("/users/me/play/:serverAddress", withAuth(), UserController.play)
       .get(
         "/servers/:serverAddress/sessions/:session",
         UserController.getUserByServerAndSession
@@ -149,7 +156,8 @@ export class UserController {
 
   static async play(ctx: Context | Router.RouterContext): Promise<void> {
     const user = (ctx as Record<string, User>).user;
-    if (!(await UserController.ensureTokenMatchesId(ctx))) return;
+    // XXX: is this needed?
+    //if (!(await UserController.ensureTokenMatchesId(ctx))) return;
     user.currentServerAddress = ctx.params.serverAddress;
     user.currentSession = randomString(32);
     await UserController.getRepository(ctx).save(user);
@@ -163,6 +171,9 @@ export class UserController {
     ctx: Context | Router.RouterContext
   ): Promise<void> {
     const { serverAddress, session } = ctx.params;
+    if (serverAddress.indexOf(':') === -1) {
+      ctx.throw(400, 'bad server IP:port passed');
+    }
     const user = await UserController.getRepository(ctx).findOne({
       currentServerAddress: serverAddress,
       currentSession: session
@@ -216,8 +227,13 @@ export class UserController {
     ctx: Context | Router.RouterContext,
     next: () => Promise<void>
   ): Promise<void> {
-    await Passport.authenticate("local", (_err, user) => {
-      if (!user) return ctx.throw(401, "Login failed");
+    await Passport.authenticate("local", (err, user) => {
+      if (err) {
+        return ctx.throw(401, err);
+      }
+      if (!user) {
+        return ctx.throw(401, "Login failed");
+      }
       const { id, hasVerifiedEmail, email, roles } = user;
       if (!hasVerifiedEmail)
         return ctx.throw(403, "Email address didn't verify");
@@ -232,6 +248,68 @@ export class UserController {
     })(ctx, next);
   }
 
+  static async loginDiscord(
+    ctx: Context | Router.RouterContext,
+  ): Promise<void> {
+    if (!ctx.query.state) {
+      ctx.throw(400, 'no state');
+    }
+    const state: string = ctx.query.state;
+    const params = new URLSearchParams({
+      client_id: config.DISCORD_CLIENT_ID,
+      scope: 'identify',
+      response_type: 'code',
+      state,
+    });
+    ctx.redirect('https://discord.com/oauth2/authorize?' + params.toString());
+  }
+
+  static async loginDiscordCallback(
+    ctx: Context | Router.RouterContext,
+    next: () => Promise<void>,
+  ): Promise<void> {
+    const state = ctx.query.state;
+    if (!state) {
+      return ctx.throw(400, 'no state');
+    }
+    await Passport.authenticate("discord", (err, user) => {
+      if (err) {
+        return ctx.throw(401, err);
+      }
+      if (!user) {
+        return ctx.throw(401, "Login failed");
+      }
+      const { id, hasVerifiedEmail, email, roles } = user;
+      if (!hasVerifiedEmail) {
+        return ctx.throw(403, "Email address didn't verify");
+      }
+      const payload = {
+        id,
+        hasVerifiedEmail,
+        email,
+        roles,
+      };
+      const token = `JWT ${jwt.sign(payload, config.JWT_SECRET)}`;
+      ctx.body = { token, id, name: user.name };
+      UserController.tokenStorage.set(state, token);
+    })(ctx, next);
+  }
+
+  static async loginDiscordStatus(
+    ctx: Context | Router.RouterContext,
+  ): Promise<void> {
+    const state = ctx.query.state;
+    if (!state) {
+      return ctx.throw(400, 'no state');
+    }
+    const token = UserController.tokenStorage.get(state);
+    if (!token) {
+      return ctx.throw(404, "When it's ready!");
+    }
+    ctx.body = { token };
+    UserController.tokenStorage.delete(state);
+  }
+
   static async ensureTokenMatchesId(
     ctx: Context | Router.RouterContext
   ): Promise<boolean> {
@@ -243,6 +321,11 @@ export class UserController {
       return false;
     }
     return true;
+  }
+
+  static async getMyUserInfo(ctx: Context | Router.RouterContext): Promise<void> {
+    const user = (ctx as Record<string, User>).user;
+    ctx.body = { id: user.id, name: user.name };
   }
 
   static async getUserInfo(ctx: Context | Router.RouterContext): Promise<void> {

@@ -2,10 +2,12 @@ import { Middleware } from "koa";
 import * as Passport from "koa-passport";
 import * as LocalStrategy from "passport-local";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
+import { Strategy as DiscordStrategy } from "passport-discord";
 import { getManager } from "typeorm";
 
 import { hashString } from "./hashString";
-import { User } from "../models/user";
+import { randomString } from "../utils/random-string";
+import { User, makeFakeDiscordEmail } from "../models/user";
 
 import { config } from "../cfg";
 
@@ -40,6 +42,43 @@ export const passportInit = (connectionName: string): Middleware => {
 
         return done(null, user);
       }
+    )
+  );
+
+  Passport.use(
+    new DiscordStrategy(
+      {
+        clientID: config.DISCORD_CLIENT_ID!,
+        clientSecret: config.DISCORD_CLIENT_SECRET!,
+        scope: ['identify'],
+      },
+      (_accessToken, _refreshToken, profile, done) => {
+        (async () => {
+          console.log(profile);
+          const email = makeFakeDiscordEmail(profile.id);
+          const user = await userRepository.findOne({ email })
+
+          if (!user) {
+            const user: User = new User();
+            user.name = profile.id;
+            user.email = email;
+            user.password = randomString(32);
+            user.verificationPin = randomString(32);
+
+            await userRepository.save(user);
+            const actualUser = await userRepository.findOne({ email: user.email });
+            if (!actualUser) {
+              throw new Error("couldn't save user");
+            }
+
+            return actualUser;
+          }
+
+          return user;
+        })()
+          .then((user) => done(null, user))
+          .catch((err) => done(err));
+      },
     )
   );
 

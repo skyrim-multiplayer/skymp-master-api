@@ -27,7 +27,7 @@ require("child_process").exec("git rev-parse HEAD", function (_err, stdout) {
     synchronize: true,
     entities: entities,
     subscribers: subscribers,
-    ssl: { rejectUnauthorized: false }
+    // ssl: { rejectUnauthorized: false }
   })
     .then(async (connection) => {
       const app = new App(connection, {
