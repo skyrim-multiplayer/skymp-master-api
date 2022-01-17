@@ -2,13 +2,9 @@
 
 set -e
 
-die() {
-  echo "$@" >&2
-  exit 1
-}
-
 if [ ! -e Dockerfile ]; then
-  die run this script from repo root
+  echo run this script from repo root >&2
+  exit 1
 fi
 
 # cheatsheet: https://stackoverflow.com/a/44606194
