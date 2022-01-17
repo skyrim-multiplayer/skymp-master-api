@@ -13,7 +13,6 @@ REST service that provides access to users, servers, and statistics of Skyrim Mu
 - DB_PASSWORD: `your_pass`
 - EMAIL_USER - currently unused
 - EMAIL_PASS - currently unused
-- STATS_CSV_PATH - seems to be set locally
 - S3_AWS_ACCESS_KEY_ID - unused
 - S3_AWS_SECRET_ACCESS_KEY - unused
 - DISCORD_CLIENT_ID - nic11 maintains it, I fill with random characters
