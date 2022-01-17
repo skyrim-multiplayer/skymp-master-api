@@ -11,7 +11,7 @@ fi
 # ? without : accepts empty string
 # Ensuring all required variables are set:
 echo "${JWT_SECRET:?}" > /dev/null
-echo "${DB_URL:?}" > /dev/null
+echo "${DB_PASSWORD:?}" > /dev/null
 echo "${EMAIL_USER:=}" > /dev/null
 echo "${EMAIL_PASS:=}" > /dev/null
 echo "${STATS_CSV_PATH:?}" > /dev/null
@@ -19,6 +19,8 @@ echo "${S3_AWS_ACCESS_KEY_ID:=}" > /dev/null
 echo "${S3_AWS_SECRET_ACCESS_KEY:=}" > /dev/null
 echo "${DISCORD_CLIENT_ID:?}" > /dev/null
 echo "${DISCORD_CLIENT_SECRET:?}" > /dev/null
+
+DB_URL="postgres://master:$DB_PASSWORD@127.0.0.1:5432/skymp"
 
 MASTER_STATS_CSV_PATH="$HOME/skymp_master_stats.csv"
 
