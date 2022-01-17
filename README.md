@@ -10,7 +10,7 @@ REST service that provides access to users, servers, and statistics of Skyrim Mu
 - KEY: `-----BEGIN RSA PRIVATE KEY----- ...`
 - MASTER_REPO: `skyrim-multiplayer/skymp-master-api`
 - JWT_SECRET: `idk`
-- DB_URL - seems to be set locally
+- DB_PASSWORD: `your_pass`
 - EMAIL_USER - currently unused
 - EMAIL_PASS - currently unused
 - STATS_CSV_PATH - seems to be set locally

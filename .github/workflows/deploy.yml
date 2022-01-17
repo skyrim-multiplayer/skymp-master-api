@@ -8,7 +8,7 @@ jobs:
     env:
       MASTER_REPO: ${{ secrets.MASTER_REPO }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      DB_URL: ${{ secrets.DB_URL }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       EMAIL_USER: ${{ secrets.EMAIL_USER }}
       EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
       STATS_CSV_PATH: ${{ secrets.STATS_CSV_PATH }}
@@ -40,6 +40,6 @@ jobs:
             docker rmi $(docker images -f "dangling=true" -q) --force || true
             rm -rf $GITHUB_SHA
             echo "it works"
-          envs: GITHUB_SHA,MASTER_REPO,JWT_SECRET,DB_URL,EMAIL_USER,EMAIL_PASS,STATS_CSV_PATH,S3_AWS_ACCESS_KEY_ID,S3_AWS_SECRET_ACCESS_KEY,DISCORD_CLIENT_ID,DISCORD_CLIENT_SECRET
+          envs: GITHUB_SHA,MASTER_REPO,JWT_SECRET,DB_PASSWORD,EMAIL_USER,EMAIL_PASS,STATS_CSV_PATH,S3_AWS_ACCESS_KEY_ID,S3_AWS_SECRET_ACCESS_KEY,DISCORD_CLIENT_ID,DISCORD_CLIENT_SECRET
           script_stop: true
           command_timeout: 6h
