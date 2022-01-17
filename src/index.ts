@@ -34,7 +34,7 @@ require("child_process").exec("git rev-parse HEAD", function (_err, stdout) {
         enableLogging: true,
         statsCsvPath: getStatsCsvPath()
       });
-      await app.listen(config.PORT);
+      await app.listen(config.PORT, "127.0.0.1"); // TODO: Unhardcode
       console.log(`Server started on port ${config.PORT}.`);
     })
     .catch((error: string) => {
