@@ -33,7 +33,7 @@ docker rm skymp-master-api || true
 
 docker run -d --restart=always \
   -e USE_ARGS=1 \
-  -e PORT=3000 \
+  -e PORT=2999 \
   -e JWT_SECRET="$JWT_SECRET" \
   -e DB_URL="$DB_URL" \
   -e EMAIL_USER="$EMAIL_USER" \
