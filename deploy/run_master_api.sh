@@ -42,6 +42,5 @@ docker run -d --restart=always \
   -e DISCORD_CLIENT_ID="$DISCORD_CLIENT_ID" \
   -e DISCORD_CLIENT_SECRET="$DISCORD_CLIENT_SECRET" \
   -v "$PWD/data:/data" \
-  -p 127.0.0.1:3000:3000 \
-  -v "$PWD/data/postgres_run:/var/run/postgresql" \
+  --network=host \
   --name=skymp-master-api skymp-master-api

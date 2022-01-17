@@ -11,5 +11,4 @@ docker run -d --restart=always \
     -e POSTGRES_PASSWORD="$DB_PASSWORD" \
     -e POSTGRES_DB=skymp \
     -p 127.0.0.1:5432:5432 \
-    -v "$PWD/data/postgres_run:/var/run/postgresql" \
     --name=skymp-master-postgres postgres
