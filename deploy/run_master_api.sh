@@ -24,10 +24,15 @@ echo "${S3_AWS_SECRET_ACCESS_KEY:=}" > /dev/null
 echo "${DISCORD_CLIENT_ID:?}" > /dev/null
 echo "${DISCORD_CLIENT_SECRET:?}" > /dev/null
 
-docker build . --tag=skymp-master-api #|| die "Can't build image"
+MASTER_STATS_CSV_PATH="$HOME/skymp_master_stats.csv"
 
-[ -e data/stats.csv ] || echo "Time,PlayersOnline,ServersOnline" > data/stats.csv
-chmod o+w data/stats.csv
+docker build . --tag=skymp-master-api
+
+[ -e "$MASTER_STATS_CSV_PATH" ] || echo "Time,PlayersOnline,ServersOnline" > "$MASTER_STATS_CSV_PATH"
+chmod o+w "$MASTER_STATS_CSV_PATH"
+
+docker stop skymp-master-api || true
+docker rm skymp-master-api || true
 
 docker run -d --restart=always \
   -e USE_ARGS=1 \
@@ -42,6 +47,6 @@ docker run -d --restart=always \
   -e S3_AWS_SECRET_ACCESS_KEY="$S3_AWS_SECRET_ACCESS_KEY" \
   -e DISCORD_CLIENT_ID="$DISCORD_CLIENT_ID" \
   -e DISCORD_CLIENT_SECRET="$DISCORD_CLIENT_SECRET" \
-  -v "$PWD/data/stats.csv:/usr/src/data/stats.csv" \
+  -v "$MASTER_STATS_CSV_PATH:/usr/src/data/stats.csv" \
   --network=host \
   --name=skymp-master-api skymp-master-api
