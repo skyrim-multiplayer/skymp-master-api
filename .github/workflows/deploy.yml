@@ -38,6 +38,7 @@ jobs:
             #chmod 777 ./deploy/run_master_api.sh
             #./deploy/run_master_api.sh
             docker rmi $(docker images -f "dangling=true" -q) --force || true
+            cd ..
             rm -rf $GITHUB_SHA
             echo "it works"
           envs: GITHUB_SHA,MASTER_REPO,JWT_SECRET,DB_PASSWORD,EMAIL_USER,EMAIL_PASS,STATS_CSV_PATH,S3_AWS_ACCESS_KEY_ID,S3_AWS_SECRET_ACCESS_KEY,DISCORD_CLIENT_ID,DISCORD_CLIENT_SECRET
