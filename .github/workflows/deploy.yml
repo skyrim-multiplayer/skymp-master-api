@@ -18,7 +18,7 @@ jobs:
       DISCORD_CLIENT_SECRET: ${{ secrets.DISCORD_CLIENT_SECRET }}
     steps:
       - name: executing remote ssh commands using password
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.HOST }}
           port: ${{ secrets.PORT }}
