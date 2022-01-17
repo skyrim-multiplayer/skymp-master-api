@@ -46,7 +46,7 @@ export class App {
 
   listen(port: number): Promise<void> {
     return new Promise((resolve) => {
-      const server = this.app.listen(port, resolve);
+      const server = this.app.listen(port, "127.0.0.1", resolve); // TODO(#20): Unhardcode
       this.onClose.push(() => server.close());
     });
   }
