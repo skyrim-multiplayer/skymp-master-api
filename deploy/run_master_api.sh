@@ -21,7 +21,7 @@ echo "${DISCORD_CLIENT_SECRET:?}" > /dev/null
 
 DB_URL="postgres://master:$DB_PASSWORD@127.0.0.1:5432/skymp"
 
-MASTER_STATS_CSV_PATH="$HOME/skymp_master_stats.csv"
+MASTER_STATS_CSV_PATH="${MASTER_STATS_CSV_PATH:="$HOME/skymp_master_stats.csv"}"
 
 docker build . --tag=skymp-master-api
 
