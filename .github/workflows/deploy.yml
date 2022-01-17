@@ -43,7 +43,8 @@ jobs:
             git remote add origin https://github.com/$MASTER_REPO.git
             git fetch origin $GITHUB_SHA
             git reset --hard FETCH_HEAD
-            ./deploy/first_run/run_db_container.sh || true
+            echo "Please, move docker rm to run_master_api.sh"
+            docker rm -f skymp-master-api || true
             ./deploy/run_master_api.sh
             docker rmi $(docker images -f "dangling=true" -q) --force || true
             cd ..
