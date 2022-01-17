@@ -35,8 +35,8 @@ jobs:
             git reset --hard FETCH_HEAD
             echo "Please, move docker rm to run_master_api.sh"
             docker rm -f skymp-master-api || true
-            #chmod 777 ./deploy/run_master_api.sh
-            #./deploy/run_master_api.sh
+            chmod 777 ./deploy/run_master_api.sh
+            ./deploy/run_master_api.sh
             docker rmi $(docker images -f "dangling=true" -q) --force || true
             cd ..
             rm -rf $GITHUB_SHA
