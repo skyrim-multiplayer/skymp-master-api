@@ -26,6 +26,15 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.KEY }}
           script: |
+            export JWT_SECRET="${{ secrets.JWT_SECRET }}"
+            export DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+            export EMAIL_USER="${{ secrets.EMAIL_USER }}"
+            export EMAIL_PASS="${{ secrets.EMAIL_PASS }}"
+            export STATS_CSV_PATH="${{ secrets.STATS_CSV_PATH }}"
+            export S3_AWS_ACCESS_KEY_ID="${{ secrets.S3_AWS_ACCESS_KEY_ID }}"
+            export S3_AWS_SECRET_ACCESS_KEY="${{ secrets.S3_AWS_SECRET_ACCESS_KEY }}"
+            export DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID }}"
+            export DISCORD_CLIENT_SECRET="${{ secrets.DISCORD_CLIENT_SECRET }}"
             mkdir -p skymp-master-api
             cd skymp-master-api
             mkdir -p $GITHUB_SHA && cd $GITHUB_SHA
@@ -36,7 +45,7 @@ jobs:
             git reset --hard FETCH_HEAD
             echo "Please, move docker rm to run_master_api.sh"
             docker rm -f skymp-master-api || true
-            JWT_SECRET=$JWT_SECRET DB_PASSWORD=$DB_PASSWORD ./deploy/run_master_api.sh
+            ./deploy/run_master_api.sh
             docker rmi $(docker images -f "dangling=true" -q) --force || true
             cd ..
             rm -rf $GITHUB_SHA
