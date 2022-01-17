@@ -30,6 +30,7 @@ docker build . --tag=skymp-master-api #|| die "Can't build image"
 chmod o+w data/stats.csv
 
 docker run -d --restart=always \
+  -e USE_ARGS=1 \
   -e PORT=3000 \
   -e JWT_SECRET="$JWT_SECRET" \
   -e DB_URL="$DB_URL" \
@@ -41,6 +42,6 @@ docker run -d --restart=always \
   -e S3_AWS_SECRET_ACCESS_KEY="$S3_AWS_SECRET_ACCESS_KEY" \
   -e DISCORD_CLIENT_ID="$DISCORD_CLIENT_ID" \
   -e DISCORD_CLIENT_SECRET="$DISCORD_CLIENT_SECRET" \
-  -v "$PWD/data:/data" \
+  -v "$PWD/data/stats.csv:/usr/src/data/stats.csv" \
   --network=host \
   --name=skymp-master-api skymp-master-api
