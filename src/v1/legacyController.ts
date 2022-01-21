@@ -104,8 +104,12 @@ export class LegacyController {
         "Address must contain IP and port (i.e. 127.0.0.1:7777)"
       );
     }
+    if (!ctx.request.headers['x-real-ip']) {
+      console.warn('No x-real-ip header proxied. This is probably ok for a ' +
+        'development setup, but should not be the case for anything deployed to a server');
+    }
     const [ip, port] = ctx.params.address.split(":");
-    if (!ctx.ip.startsWith("::") && ctx.ip !== ip) {
+    if (ctx.ip !== ip) {
       return ctx.throw(
         403,
         `Your IP is expected to be ${ip}, but it is ${ctx.ip}`
