@@ -5,6 +5,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      MASTER_REPO: ${{ secrets.MASTER_REPO }}
     steps:
       - run: env
       - name: executing remote ssh commands using password
