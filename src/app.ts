@@ -27,6 +27,7 @@ export class App {
       .use(passportInit(this.connection.name));
     this.app.context["connectionName"] = this.connection.name;
     this.app.context["statsManager"] = this.statsManager;
+    this.app.proxy = true;
 
     if (options.enableLogging) this.app.use(logger());
 
