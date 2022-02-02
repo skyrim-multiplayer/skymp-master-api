@@ -22,3 +22,5 @@ REST service that provides access to users, servers, and statistics of Skyrim Mu
 
 It is hardcoded. See `index.ts`.
 Use Nginx to make the service accessible from the Internet.
+
+<!-- rerun -->
