@@ -1,4 +1,4 @@
-# skymp-master-api
+# skymp-master-api 
 
 REST service that provides access to users, servers, and statistics of Skyrim Multiplayer.
 
