@@ -103,6 +103,27 @@ export class User {
   })
   currentSession!: string;
 
+  @Column("varchar", {
+    name: "discord_username",
+    nullable: true,
+    default: null
+  })
+  discordUsername!: string | null;
+
+  @Column("varchar", {
+    name: "discord_discriminator",
+    nullable: true,
+    default: null
+  })
+  discordDiscriminator!: string | null;
+
+  @Column("varchar", {
+    name: "discord_avatar",
+    nullable: true,
+    default: null
+  })
+  discordAvatar!: string | null;
+
   @BeforeInsert()
   async hashPassword(): Promise<void> {
     this.password = await hashString(this.password, this.email);
