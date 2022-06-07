@@ -51,6 +51,11 @@ export const passportInit = (connectionName: string): Middleware => {
         clientID: config.DISCORD_CLIENT_ID!,
         clientSecret: config.DISCORD_CLIENT_SECRET!,
         scope: ['identify'],
+        callbackURL: (
+          config.EXTERNAL_URL_BASE
+            ? config.EXTERNAL_URL_BASE + '/api/users/login-discord/callback'
+            : undefined
+        ),
       },
       (_accessToken, _refreshToken, profile, done) => {
         (async () => {
@@ -64,6 +69,9 @@ export const passportInit = (connectionName: string): Middleware => {
             user.email = email;
             user.password = randomString(32);
             user.verificationPin = randomString(32);
+            user.discordUsername = profile.username;
+            user.discordDiscriminator = profile.discriminator;
+            user.discordAvatar = profile.avatar;
 
             await userRepository.save(user);
             const actualUser = await userRepository.findOne({ email: user.email });

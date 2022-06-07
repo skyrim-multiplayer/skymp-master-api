@@ -12,6 +12,7 @@ export interface Config {
   S3_AWS_SECRET_ACCESS_KEY?: string;
   DISCORD_CLIENT_ID: string;
   DISCORD_CLIENT_SECRET: string;
+  EXTERNAL_URL_BASE?: string;
 }
 
 const getConfig = (): Config => {
@@ -31,6 +32,7 @@ const getConfig = (): Config => {
       "S3_AWS_SECRET_ACCESS_KEY",
       "DISCORD_CLIENT_ID",
       "DISCORD_CLIENT_SECRET",
+      "EXTERNAL_URL_BASE",
     ].forEach((optionName) => {
       if (process.env[optionName] !== undefined) {
         config[optionName] = process.env[optionName];

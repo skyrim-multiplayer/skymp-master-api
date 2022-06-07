@@ -26,8 +26,15 @@ const generatePassword = (
     .map((x) => wishlist[x % wishlist.length])
     .join("");
 
+interface AuthStatus {
+  token: string;
+  discordUsername: string;
+  discordDiscriminator: string;
+  discordAvatar: string;
+}
+
 export class UserController {
-  static tokenStorage = new Map<string, string>();
+  static authDataStorage = new Map<string, AuthStatus>();
 
   static getRouter(): Router {
     return new Router()
@@ -261,6 +268,9 @@ export class UserController {
       response_type: 'code',
       state,
     });
+    if (config.EXTERNAL_URL_BASE) {
+      params.set('redirect_uri', config.EXTERNAL_URL_BASE + '/api/users/login-discord/callback');
+    }
     ctx.redirect('https://discord.com/oauth2/authorize?' + params.toString());
   }
 
@@ -291,7 +301,12 @@ export class UserController {
       };
       const token = `JWT ${jwt.sign(payload, config.JWT_SECRET)}`;
       ctx.body = { token, id, name: user.name };
-      UserController.tokenStorage.set(state, token);
+      UserController.authDataStorage.set(state, {
+        token,
+        discordUsername: user.discordUsername,
+        discordAvatar: user.discordAvatar,
+        discordDiscriminator: user.discordDiscriminator,
+      });
     })(ctx, next);
   }
 
@@ -302,12 +317,12 @@ export class UserController {
     if (!state) {
       return ctx.throw(400, 'no state');
     }
-    const token = UserController.tokenStorage.get(state);
-    if (!token) {
-      return ctx.throw(404, "When it's ready!");
+    const data = UserController.authDataStorage.get(state);
+    if (!data) {
+      return ctx.throw(401, "When it's ready!");
     }
-    ctx.body = { token };
-    UserController.tokenStorage.delete(state);
+    ctx.body = data;
+    UserController.authDataStorage.delete(state);
   }
 
   static async ensureTokenMatchesId(
