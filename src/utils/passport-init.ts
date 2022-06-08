@@ -82,6 +82,11 @@ export const passportInit = (connectionName: string): Middleware => {
             return actualUser;
           }
 
+          user.discordUsername = profile.username;
+          user.discordDiscriminator = profile.discriminator;
+          user.discordAvatar = profile.avatar;
+          await userRepository.save(user);
+
           return user;
         })()
           .then((user) => done(null, user))
