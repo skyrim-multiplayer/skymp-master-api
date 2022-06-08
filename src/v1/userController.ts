@@ -28,9 +28,10 @@ const generatePassword = (
 
 interface AuthStatus {
   token: string;
-  discordUsername: string;
-  discordDiscriminator: string;
-  discordAvatar: string;
+  masterApiId: number;
+  discordUsername: string | null;
+  discordDiscriminator: string | null;
+  discordAvatar: string | null;
 }
 
 export class UserController {
@@ -282,7 +283,7 @@ export class UserController {
     if (!state) {
       return ctx.throw(400, 'no state');
     }
-    await Passport.authenticate("discord", (err, user) => {
+    await Passport.authenticate("discord", (err, user: User) => {
       if (err) {
         return ctx.throw(401, err);
       }
@@ -300,9 +301,10 @@ export class UserController {
         roles,
       };
       const token = `JWT ${jwt.sign(payload, config.JWT_SECRET)}`;
-      ctx.body = { token, id, name: user.name };
+      ctx.body = 'Success! You may return to the game...';
       UserController.authDataStorage.set(state, {
         token,
+        masterApiId: id,
         discordUsername: user.discordUsername,
         discordAvatar: user.discordAvatar,
         discordDiscriminator: user.discordDiscriminator,
