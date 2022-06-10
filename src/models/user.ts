@@ -104,6 +104,13 @@ export class User {
   currentSession!: string;
 
   @Column("varchar", {
+    name: "discord_id",
+    nullable: true,
+    default: null
+  })
+  discordId!: string | null;
+
+  @Column("varchar", {
     name: "discord_username",
     nullable: true,
     default: null

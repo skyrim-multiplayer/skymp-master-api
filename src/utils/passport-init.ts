@@ -69,6 +69,7 @@ export const passportInit = (connectionName: string): Middleware => {
             user.email = email;
             user.password = randomString(32);
             user.verificationPin = randomString(32);
+            user.discordId = profile.id;
             user.discordUsername = profile.username;
             user.discordDiscriminator = profile.discriminator;
             user.discordAvatar = profile.avatar;
@@ -82,6 +83,7 @@ export const passportInit = (connectionName: string): Middleware => {
             return actualUser;
           }
 
+          user.discordId = profile.id;
           user.discordUsername = profile.username;
           user.discordDiscriminator = profile.discriminator;
           user.discordAvatar = profile.avatar;

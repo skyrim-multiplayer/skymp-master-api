@@ -186,13 +186,16 @@ export class UserController {
       currentServerAddress: serverAddress,
       currentSession: session
     });
-    if (!user) return ctx.throw(404);
-    else
+    if (!user) {
+      return ctx.throw(404);
+    } else {
       ctx.body = {
         user: {
-          id: user.id
-        }
+          id: user.id,
+          discordId: user.discordId,
+        },
       };
+    }
   }
 
   static async verifyEnduser(
