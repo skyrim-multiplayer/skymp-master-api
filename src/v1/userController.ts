@@ -304,7 +304,29 @@ export class UserController {
         roles,
       };
       const token = `JWT ${jwt.sign(payload, config.JWT_SECRET)}`;
-      ctx.body = 'Success! You may return to the game...';
+      ctx.type = "html";
+      ctx.body = `
+        <style>
+          body {
+            background-color: black;
+          }
+
+          #wrapper {
+            display: flex;
+            justify-content: center;
+            height: 100%;
+          }
+
+          #img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+          }
+        </style>
+        <div id="wrapper">
+          <img src="https://cdn.discordapp.com/attachments/860617710446444544/985315433777352714/caa98e8e9d020129.jpg" id="img">
+        </div>
+      `;
       UserController.authDataStorage.set(state, {
         token,
         masterApiId: id,
