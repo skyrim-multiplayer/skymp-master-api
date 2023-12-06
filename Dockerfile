@@ -6,5 +6,5 @@ COPY data/stats0911.csv ./data/
 RUN npm install
 COPY --chown=www-data:www-data src ./src
 EXPOSE 3000
-USER www-data
+#USER www-data
 CMD [ "npm", "run", "start" ]
